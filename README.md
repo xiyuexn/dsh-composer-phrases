@@ -20,6 +20,10 @@ when it is actually ready.
   silently restored.
 - Click outside, or click the capsule again, to close. The caret flips to `▾` while open.
 - While the composer is busy (`submitting` / `adjudicating`), phrase rows are disabled.
+- If the caret insert cannot be done (both attempts go stale), the phrase is appended at the end of
+  the draft behind a space, and the capsule says `已追加到输入框末尾`. It never appends silently.
+- The pill stays 20px tall so the tool row keeps its density, but its hit area is padded out to about
+  36px, and on touch devices it grows to 28px tall and 44px wide.
 - Phrases live in this browser's `localStorage` only.
 
 ## Insert, not send
@@ -58,7 +62,7 @@ dsh plugin --profile <profile> add "<repo>/dist/dsh-composer-phrases-<version>.t
 tar -tzf <package>.tgz     # 9 entries = the 7 entries in package.json "files", plus
                            # package.json and LICENSE (npm adds LICENSE automatically)
 tar -xzf <package>.tgz -C <temp-dir>
-node <temp-dir>/package/test/harness.mjs   # ALL GREEN: 75/75 checks passed
+node <temp-dir>/package/test/harness.mjs   # ALL GREEN: 79/79 checks passed
 ```
 
 All behavior lives in `lib/client.js` and can be read line by line. `lib/index.js` is the host half
@@ -113,7 +117,7 @@ dock, which also registers without an inject face.
 ## Offline self-test
 
 ```sh
-node test/harness.mjs      # 75 checks
+node test/harness.mjs      # 79 checks
 ```
 
 Covers the bundle handoff, host-only `react`, style-tag injection and cleanup, seat and order,

@@ -17,6 +17,10 @@
 - 每条右侧 `×` 删除；**删光就保持空**，不会偷偷把默认短语塞回来。
 - 点面板外面、或再点胶囊收起；展开时箭头是 `▾`。
 - 输入框正在发送（`submitting` / `adjudicating`）时，短语行变灰不可点。
+- 两次按光标插入都因版本过期失败时，短语会带一个空格追加到草稿末尾，胶囊下方显示
+  `已追加到输入框末尾`——**不会静默追加**。
+- 胶囊视觉高度仍是 20px，不吃工具行的排版密度；可点区域向外扩到约 36px，触摸设备上直接放大到
+  28px 高、44px 宽。
 - 短语只存在这台机器的浏览器 `localStorage` 里。
 
 ## 插入，不是发送
@@ -54,7 +58,7 @@ dsh plugin --profile <profile名> add "<仓库>/dist/dsh-composer-phrases-<版�
 tar -tzf <包文件>.tgz     # 9 项 = package.json "files" 里的 7 项 + package.json + LICENSE
                           # （LICENSE 是 npm 自动附带的，手工按 files 打包只有 8 项）
 tar -xzf <包文件>.tgz -C <临时目录>
-node <临时目录>/package/test/harness.mjs     # ALL GREEN: 75/75 checks passed
+node <临时目录>/package/test/harness.mjs     # ALL GREEN: 79/79 checks passed
 ```
 
 全部行为都在 `lib/client.js` 里，可以逐行核对；`lib/index.js` 是宿主半边，故意什么都不做。
@@ -104,7 +108,7 @@ dsh plugin --profile <profile名> remove dsh-composer-phrases
 ## 离线自测
 
 ```sh
-node test/harness.mjs      # 75 项
+node test/harness.mjs      # 79 项
 ```
 
 覆盖：bundle 交接、只依赖宿主 react、样式注入与卸载清理、座位与 order、默认收起、开面板与箭头翻转、

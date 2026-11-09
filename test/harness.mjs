@@ -240,6 +240,7 @@ const panelOf = (tree) => byClass(tree, 'dsh-qp__panel')[0]
 const triggerOf = (tree) => byClass(tree, 'dsh-qp__trigger')[0]
 const inputOf = (tree) => byClass(tree, 'dsh-qp__input')[0]
 const buttonByText = (tree, text) => findAll(tree, (node) => node.type === 'button' && node.props?.children === text)[0]
+const hintOf = (tree) => byClass(tree, 'dsh-qp__hint')[0]
 
 /* ------------------------------------------------------------------ *
  * Load the real plugin bundle
@@ -388,7 +389,25 @@ tree = act(() => triggerOf(tree).props.onClick())
 tree = act(() => picks(tree)[1].props.onClick())
 eq(insertCalls.length, 2, 'insertText retried once before giving up')
 eq(draftCalls.length, 1, 'setDraft used as the last resort')
-eq(draftCalls[0], '已打的字先给我几个方案', 'fallback appends instead of replacing')
+eq(draftCalls[0], '已打的字 先给我几个方案', 'fallback appends with a separator')
+eq(hintOf(tree)?.props.children, '已追加到输入框末尾', 'fallback says it appended')
+
+console.log('\n[ fallback: no separator when the draft already ends in whitespace ]')
+insertCalls.length = 0
+draftCalls.length = 0
+const stale2 = { ...actions, insertText: () => false }
+tree = mount({ inputActions: stale2, useInput: inputHook({ draft: '已打的字 ' }) })
+tree = act(() => triggerOf(tree).props.onClick())
+tree = act(() => picks(tree)[1].props.onClick())
+eq(draftCalls[0], '已打的字 先给我几个方案', 'no doubled whitespace at the append point')
+
+console.log('\n[ a clean caret insert leaves no hint ]')
+insertCalls.length = 0
+draftCalls.length = 0
+tree = mount({ inputActions: actions, useInput: inputHook({ draft: 'abc' }) })
+tree = act(() => triggerOf(tree).props.onClick())
+tree = act(() => picks(tree)[0].props.onClick())
+eq(hintOf(tree), undefined, 'no hint after the caret insert succeeded')
 
 console.log('\n[ no composer face: inert, never throws ]')
 tree = mount({ inputActions: undefined })
@@ -400,6 +419,7 @@ try {
 	threw = error
 }
 ok(threw === null, 'picking without inputActions does not throw', String(threw))
+eq(hintOf(tree)?.props.children, '输入框不可用', 'says the composer is unavailable')
 
 console.log('\n[ busy composer disables the rows ]')
 tree = mount({ inputActions: actions, useInput: inputHook({ phase: 'submitting' }) })
