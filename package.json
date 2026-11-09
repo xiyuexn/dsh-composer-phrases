@@ -1,6 +1,6 @@
 {
   "name": "dsh-composer-phrases",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DSH client plugin: a phrase capsule in the composer tool row. Clicking a phrase writes it at the caret instead of sending it, so the draft you already typed stays editable. Local-only, zero dependencies, no build step.",
   "type": "module",
   "main": "lib/index.js",

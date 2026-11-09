@@ -390,7 +390,8 @@ tree = act(() => picks(tree)[1].props.onClick())
 eq(insertCalls.length, 2, 'insertText retried once before giving up')
 eq(draftCalls.length, 1, 'setDraft used as the last resort')
 eq(draftCalls[0], '已打的字 先给我几个方案', 'fallback appends with a separator')
-eq(hintOf(tree)?.props.children, '已追加到输入框末尾', 'fallback says it appended')
+eq(hintOf(tree)?.props.children, '已追加到末尾', 'fallback says it appended')
+eq(triggerOf(tree).props.children, '已追加到末尾', 'the pill itself carries the notice')
 
 console.log('\n[ fallback: no separator when the draft already ends in whitespace ]')
 insertCalls.length = 0
