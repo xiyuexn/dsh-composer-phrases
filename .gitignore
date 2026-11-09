@@ -1,0 +1,10 @@
+# Dependencies (there are none, but a link: install can leave these around)
+node_modules/
+
+# Packed releases
+*.tgz
+
+# Logs and OS noise
+*.log
+.DS_Store
+Thumbs.db

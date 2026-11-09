@@ -1,0 +1,57 @@
+{
+  "name": "dsh-composer-phrases",
+  "version": "0.1.0",
+  "description": "DSH client plugin: a phrase capsule in the composer tool row. Clicking a phrase writes it at the caret instead of sending it, so the draft you already typed stays editable. Local-only, zero dependencies, no build step.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "test/harness.mjs"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "scripts": {
+    "test": "node test/harness.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "composer",
+    "phrases",
+    "caret",
+    "prompt"
+  ],
+  "author": "xiyuexn",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiyuexn/deepseek-phrases.git"
+  },
+  "homepage": "https://github.com/xiyuexn/deepseek-phrases#readme",
+  "bugs": {
+    "url": "https://github.com/xiyuexn/deepseek-phrases/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,6 @@
+# dsh-composer-phrases — a phrase capsule in the composer tool row
+# Client-only plugin: it injects no service, emits no Cordis event, touches no
+# model request and opens no network connection.
+- insert:
+    - id: dsh-composer-phrases
+      name: 'dsh-composer-phrases'
