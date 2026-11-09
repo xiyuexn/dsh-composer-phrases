@@ -1,5 +1,7 @@
 # dsh-composer-phrases
 
+![输入卡片工具行里的短语胶囊](assets/composer-toolbar.png)
+
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（`dsh`）的客户端插件。
 在输入卡片底部的工具行加一个小胶囊，点开是一条条短语；**点短语是把它按光标插进输入框，不是发送。**
 
@@ -36,10 +38,21 @@ dsh plugin --profile <profile名> add "<包文件绝对路径>.tgz"
 这种 profile 要在 App 自带的插件管理器里装（选本地包/目录），或用插件管理工具
 （`plugin_manager` / `install_bundle`）。
 
-装之前可以先核一遍包：
+### Release 下载不了时
+
+部分网络下 `release-assets.githubusercontent.com` 不可达，Release 页面能打开、附件却下不下来。
+同样的包已提交在仓库的 [`dist/`](dist/) 里，直接取那个文件安装即可：
 
 ```sh
-tar -tzf <包文件>.tgz                       # 应只有 8 项
+# 先把仓库拉下来，再装仓库里那份 tgz
+dsh plugin --profile <profile名> add "<仓库>/dist/dsh-composer-phrases-<版本>.tgz"
+```
+
+### 装之前核一遍包
+
+```sh
+tar -tzf <包文件>.tgz     # 9 项 = package.json "files" 里的 7 项 + package.json + LICENSE
+                          # （LICENSE 是 npm 自动附带的，手工按 files 打包只有 8 项）
 tar -xzf <包文件>.tgz -C <临时目录>
 node <临时目录>/package/test/harness.mjs     # ALL GREEN: 75/75 checks passed
 ```
@@ -51,6 +64,17 @@ node <临时目录>/package/test/harness.mjs     # ALL GREEN: 75/75 checks passe
 新装通常要重启一次 `dsh`；以 `link:` 接入的会热重载。然后看输入卡片工具行：权限选择右侧应出现
 那颗胶囊。若你的 dsh 能查插槽，更硬的证据是 `conversation.input.left` 的占用者里有
 `id: composer-phrases`、`active: true`。
+
+### 端到端手动核对（装完请走一遍）
+
+自测是逻辑级的（自带 React 替身与假 DOM），下面三条只有人能点出来：
+
+1. 胶囊出现在工具行里、**权限选择控件的右侧**。
+2. 点一条短语，文字**落在光标处**，输入框里原有的草稿不变。
+3. 输入框正在发送时，短语行**变灰不可点**。
+
+任何一条不对，说明插件没坐上位子，或这个版本用的是别的插槽名。先查
+`conversation.input.left` 是否存在；不存在就改 `lib/client.js` 顶部的 `SLOT` 常量。
 
 ## 卸载
 
@@ -88,13 +112,18 @@ node test/harness.mjs      # 75 项
 添加（去空格/去重/回车）、删除、删空保持空、点外面关闭、监听器不残留、存储损坏降级、全程零联网。
 
 页面里的 React 由宿主注入，所以测试台自带一个极小的 React 替身（状态、带清理的副作用、ref）
-和假 DOM。这是**逻辑级**验证；端到端是人在界面上点一次。
+和假 DOM。这是**逻辑级**验证；端到端那半在上面那份手动清单里。
 
 ## 版本前提
 
-本包在 **DSH 0.2.0-rc.2（cordis 4.0.4）** 上验证通过。版本差得远时座位可能不渲染，
-表现为「装上了但不出现」，不会崩。先查 `conversation.input.left` 是否存在；不存在就改
-`lib/client.js` 顶部的 `SLOT` 常量，换成 `conversation.input.right` 或 `conversation.composer.dock`。
+在 **DSH 0.2.0-rc.2（cordis 4.0.4）** 上做过端到端点击验证：胶囊出现、按光标插入生效、忙时禁用。
+
+宿主插槽 `conversation.input.left` 在 **DSH 0.2.1（cordis 4.0.5）** 上同样存在，因此 0.2.x 系列
+**预期可用**——但这一版 tgz 没有在 0.2.1 上实际点击验证过。更高版本未验证。
+
+版本差得远时座位可能不渲染，表现为「装上了但不出现」，不会崩。先查
+`conversation.input.left` 是否存在；不存在就改 `lib/client.js` 顶部的 `SLOT` 常量，
+换成 `conversation.input.right` 或 `conversation.composer.dock`。
 
 ## 隐私
 

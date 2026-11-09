@@ -1,5 +1,7 @@
 # dsh-composer-phrases
 
+![The phrase capsule in the composer tool row](assets/composer-toolbar.png)
+
 A client-side plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`).
 It adds one small capsule to the composer tool row. Clicking a phrase **inserts it at the caret**;
 it never sends.
@@ -36,15 +38,27 @@ dsh plugin --profile <profile> add "<absolute-path>.tgz"
 
 **Desktop profile exception.** The CLI refuses it:
 `error: profile "desktop" is managed exclusively by the Electron application`.
-Install through the app's own plugin manager (local package/ directory), or the plugin management
+Install through the app's own plugin manager (local package / directory), or the plugin management
 tool (`plugin_manager` / `install_bundle`).
 
-To check the archive before installing:
+### If the Release download is blocked
+
+On some networks `release-assets.githubusercontent.com` is unreachable, so the Release asset
+cannot be downloaded even though the page loads. The same tarball is committed in
+[`dist/`](dist/) of this repository for that case:
 
 ```sh
-tar -tzf <package>.tgz                       # 8 entries expected
+# clone or fetch the repo, then install the committed tarball
+dsh plugin --profile <profile> add "<repo>/dist/dsh-composer-phrases-<version>.tgz"
+```
+
+### Check the archive before installing
+
+```sh
+tar -tzf <package>.tgz     # 9 entries = the 7 entries in package.json "files", plus
+                           # package.json and LICENSE (npm adds LICENSE automatically)
 tar -xzf <package>.tgz -C <temp-dir>
-node <temp-dir>/package/test/harness.mjs     # ALL GREEN: 75/75 checks passed
+node <temp-dir>/package/test/harness.mjs   # ALL GREEN: 75/75 checks passed
 ```
 
 All behavior lives in `lib/client.js` and can be read line by line. `lib/index.js` is the host half
@@ -56,6 +70,19 @@ New installs usually need one restart of `dsh`. A `link:` install hot-reloads in
 Then look at the composer tool row: the capsule appears to the right of the permission chip.
 If your build can inspect slots, the stronger check is that `conversation.input.left` lists an
 occupant with `id: composer-phrases` and `active: true`.
+
+### Manual end-to-end check
+
+The harness is logic-level (a React stand-in and a fake DOM). Three things still need a human click,
+and this is the list to walk through after installing:
+
+1. The capsule appears to the **right of the permission chip** in the composer tool row.
+2. Clicking a phrase writes it **at the caret**, and text already in the draft stays unchanged.
+3. While the composer is sending, the phrase rows are **disabled**.
+
+If any of these fails, the plugin either did not take the seat or this build uses a different slot
+name. Check whether `conversation.input.left` exists, and if it does not, change the `SLOT` constant
+at the top of `lib/client.js`.
 
 ## Uninstall
 
@@ -96,15 +123,20 @@ delete, empty stays empty, outside-click close, no leaked listener, corrupt-stor
 network access.
 
 The page receives React from the host, so the harness ships a minimal React stand-in (state, effects
-with cleanup, refs) plus a fake DOM. It is a logic-level check; the end-to-end check is one click in
-the real UI.
+with cleanup, refs) plus a fake DOM. It is a logic-level check; the manual list above is the
+end-to-end half.
 
 ## Compatibility
 
-Verified on **DSH 0.2.0-rc.2 (cordis 4.0.4)**. On a very different version the slot may not be
-rendered; the failure mode is "installs but never appears", not a crash. Check whether
-`conversation.input.left` exists; if it does not, change the `SLOT` constant at the top of
-`lib/client.js` to `conversation.input.right` or `conversation.composer.dock`.
+Click-tested end-to-end on **DSH 0.2.0-rc.2 (cordis 4.0.4)**: the capsule appears, the caret insert
+works, and the busy state disables the rows.
+
+The host slot `conversation.input.left` is also present in **DSH 0.2.1 (cordis 4.0.5)**, so the 0.2.x
+line is expected to work — but this exact tarball has not been click-tested there. Anything newer is
+untested. On a very different version the slot may not be rendered; the failure mode is
+"installs but never appears", not a crash. Check whether `conversation.input.left` exists, and if it
+does not, change the `SLOT` constant at the top of `lib/client.js` to `conversation.input.right` or
+`conversation.composer.dock`.
 
 ## Privacy
 
