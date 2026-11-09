@@ -1,0 +1,6 @@
+# Keep line endings identical on every platform, so a clone packs to the
+# same bytes as the published tarball.
+* text=auto eol=lf
+*.tgz binary
+*.png binary
+*.ico binary
